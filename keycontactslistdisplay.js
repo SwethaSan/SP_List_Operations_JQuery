@@ -13,9 +13,10 @@
 			  <thead>
 			    <tr>
 			      <th scope="col">Business Domains</th>
+			      <th scope="col">Functional Area</th>
 			      <th scope="col">Primary Contact</th>
 			      <th scope="col">Secondary Contact</th>
-			      <th scope="col">Functional Area</th>
+			      
 			    </tr>
 			  </thead>
 			  <tbody id='tblbody'>
@@ -28,7 +29,7 @@
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
 <script type="text/javascript">
-var tblbody; 
+var tblbody=''; 
 var bd;
 var pc;
 var sc;
@@ -58,20 +59,27 @@ $(window).on('load', function() {
 	}
 	
     function updateKeyContacts(items) {
+    	//alert(items.get_count());
         for (var i = 0; i < items.get_count(); i++) {
             var item = items.get_item(i);
-            bd = item.get_item('Title'); 
-            pc = item.get_item('PrimaryContact');
-            sc = item.get_item('SecondaryContact');
-            fa = item.get_item('Notes');        
-         }
-        tblbody += '<tr>' +
-			       '<th scope="row" id="'+bd+'"></th>' +
-			       '<td id="'+fa+'"></td>' +
-			       '<td id="'+pc+'"></td>' +
-			       '<td id="'+sc+'"></td>' +
-			       '</tr>';        			
-        $("#tblbody").appendChild(tblbody);
+            bd = item.get_item('Title'); //alert(bd);
+            var itemFieldValuesAsText = item.get_fieldValuesAsText();
+            pcname = itemFieldValuesAsText.get_item('PrimaryContact');
+            scname = itemFieldValuesAsText.get_item('SecondaryContact');
+;
+            fa = item.get_item('Notes'); //alert(fa);       
+            
+        	tblbody += '<tr>' +
+			       '<th scope="row">'+bd+'</th>' +
+			       '<td>'+fa+'</td>' +
+			       '<td>'+pcname+'</td>' +
+			       '<td>'+scname+'</td>' +
+			       '</tr>';
+		 }
+        
+        //tblbody = "<tr><td>row 1, cell 1</td><td> row 1, cell 2</td></tr>";        	
+		alert(tblbody);		
+        $("#tblbody").append(tblbody);
     }
 
     function logError(sender, args) {
@@ -99,7 +107,7 @@ $(window).on('load', function() {
         var query = new SP.CamlQuery();
         query.set_viewXml(queryText);
         var items = list.getItems(query);
-        ctx.load(items);
+        ctx.load(items, 'Include(Title,Notes,PrimaryContact, SecondaryContact, FieldValuesAsText)');
 
         ctx.executeQueryAsync(function() {
             success(items);
